@@ -378,6 +378,11 @@ async def _maybe_reset(event: Any, gateway: Any, session_store: Any,
     source = getattr(event, "source", None)
     if source is None:
         return None
+    # Local scope: only Telegram conversations are rotated by this policy.
+    platform_raw = getattr(source, "platform", None)
+    platform_name = str(getattr(platform_raw, "value", platform_raw) or "").lower()
+    if platform_name != "telegram":
+        return None
     if _is_slash_command(event):
         # Bookkeeping, not conversation (module docstring, "Slash commands"):
         # no clock stamp, no time reset. /new and /reset rotate the route
